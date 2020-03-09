@@ -40,9 +40,9 @@ initialState :: StatePose
 initialState = StatePose (V3 0 0 0) (V3 0 0 0) (identity !!* 0.01 :: Covariance)
 
 rmat :: Covariance
-rmat = V3 (V3 0.001 0 0)
-          (V3 0 0.001 0)
-          (V3 0 0 0.001)
+rmat = V3 (V3 0 0 0)
+          (V3 0 0 0)
+          (V3 0 0 0)
 
 qmat :: Covariance
 qmat = V3 (V3 0.5 0 0)

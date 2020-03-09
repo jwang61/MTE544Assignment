@@ -37,5 +37,5 @@ q4 = plot (PNG "image/q4.png") $ [ Data2D [Title "Estimate A", Color Red, Style 
         statesB = Q4b.repeatKFStep 200 Q4b.initialState Q4b.controlInput
 
 main :: IO ()
-main = sequence_ $ [q3, q4]
+main = sequence_ $ [q2, q4]
 
