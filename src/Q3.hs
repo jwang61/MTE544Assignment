@@ -5,6 +5,7 @@ module Q3
     , initialState
     , toTup
     , repeatStep
+    , getRMSE
     ) where
 
 import Control.Lens.Getter ((^.))
@@ -58,3 +59,10 @@ repeatStep' n sp inp i
   | otherwise = sp' : repeatStep' n sp' us (i+1)
   where (u : us) = inp
         sp' = updateStateX sp u
+
+getDistance :: State -> State -> Float
+getDistance x1 x2 = euclidean (x1 ^._x - x2 ^._x) (x1 ^._y - x2 ^._y)
+  where euclidean a b = sqrt (a * a + b * b)
+
+getRMSE :: [State] -> [State] -> [(Float, Float)]
+getRMSE sp1 sp2 = zip time (zipWith getDistance sp1 sp2)

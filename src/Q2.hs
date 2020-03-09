@@ -77,7 +77,7 @@ hFunc x = V2 (sqrt $ (x ^._x) ^ 2 + (x ^._y) ^ 2) (atan (x ^._y / x ^._x))
 
 hJacobian :: State -> M24 Float
 hJacobian xVec = V2 (V4 (x / sqrtxy) (y / sqrtxy) 0 0)
-                     (V4 (-y / sqr_xy) (x / sqr_xy) 0 0)
+                    (V4 (-y / sqr_xy) (x / sqr_xy) 0 0)
   where x = xVec ^._x
         y = xVec ^._y
         sqr_xy = x ^ 2 + y ^ 2
