@@ -14,9 +14,9 @@ q2 = plot (PNG "image/q2.png") $ [ Data2D [Title "Estimate", Color Red, Style Li
 q3 :: IO Bool
 q3 = do
   _ <- plot (PNG "image/q3_traj.png")
-    [ Data2D [Title "Clean", Color Red, Style Lines] [] (map Q3.toTup cleanStates)
-    , Data2D [Title "Noisy1", Color Blue, Style Lines] [] (map Q3.toTup noisyState1)
-    , Data2D [Title "Noisy2", Color Green, Style Lines] [] (map Q3.toTup noisyState2)]
+    [ Data2D [Title "Original", Color Red, Style Lines] [] (map Q3.toTup cleanStates)
+    , Data2D [Title "2%/2%", Color Blue, Style Lines] [] (map Q3.toTup noisyState1)
+    , Data2D [Title "3%/2%", Color Green, Style Lines] [] (map Q3.toTup noisyState2)]
   _ <- plot (PNG "image/q3_rmse.png")
     [ Data2D [Title "2%/2%", Color Red, Style Points] [] (Q3.getRMSE cleanStates noisyState1)
     , Data2D [Title "3%/2%", Color Blue, Style Points] [] (Q3.getRMSE cleanStates noisyState2)]
@@ -37,5 +37,5 @@ q4 = plot (PNG "image/q4.png") $ [ Data2D [Title "Estimate A", Color Red, Style 
         statesB = Q4b.repeatKFStep 200 Q4b.initialState Q4b.controlInput
 
 main :: IO ()
-main = sequence_ $ [q2, q4]
+main = sequence_ $ [q3]
 
