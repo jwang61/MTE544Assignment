@@ -7,8 +7,7 @@ import qualified Q4a
 import qualified Q4b
 
 q2 :: IO Bool
-q2 = plot (PNG "image/q2.png") $ [ Data2D [Title "Estimate", Color Red, Style Lines] [] (map Q2.toStateX states)
-                ] --, Data2D [Title "Ground Truth", Color Green, Style Lines] [] (map Q2.toGT states)]
+q2 = plot (PNG "image/q2.png") $ map (\(x, y) -> Data2D [Title ("R = " ++ show x), Color y, Style Lines] [] (map Q2.toStateX (states x))) [(0, Red), (0.001, Blue), (0.01, Green)]
   where states = Q2.repeatKFStep 100 Q2.initialState Q2.controlInput
 
 q3 :: IO Bool
@@ -28,14 +27,14 @@ q3 = do
         noisyState1 = Q3.repeatStep 100 Q3.initialState noisyControl1
         noisyState2 = Q3.repeatStep 100 Q3.initialState noisyControl2
 
-q4 :: IO Bool
-q4 = plot (PNG "image/q4.png") $ [ Data2D [Title "Estimate A", Color Red, Style Lines] [] (map Q4a.toStateX statesA)
-                --, Data2D [Title "Ground Truth A", Color Orange, Style Lines] [] (map Q4a.toGT statesA)
-                , Data2D [Title "Estimate B", Color Green, Style Lines] [] (map Q4b.toStateX statesB)
-                ] --, Data2D [Title "Ground Truth B", Color Blue, Style Lines] [] (map Q4b.toGT statesB)]
-  where statesA = Q4a.repeatKFStep 200 Q4a.initialState Q4a.controlInput
-        statesB = Q4b.repeatKFStep 200 Q4b.initialState Q4b.controlInput
+q4a :: IO Bool
+q4a = plot (PNG "image/q4a.png") $ map (\(x, y) -> Data2D [Title ("R = " ++ show x), Color y, Style Lines] [] (map Q4a.toStateX (states x))) [(0, Red), (0.001, Blue), (0.01, Green)]
+  where states = Q4a.repeatKFStep 200 Q4a.initialState Q4a.controlInput
+
+q4b :: IO Bool
+q4b = plot (PNG "image/q4b.png") $ map (\(x, y) -> Data2D [Title ("R = " ++ show x), Color y, Style Lines] [] (map Q4b.toStateX (states x))) [(0, Red), (0.001, Blue), (0.01, Green)]
+  where states = Q4b.repeatKFStep 200 Q4b.initialState Q4b.controlInput
 
 main :: IO ()
-main = sequence_ $ [q3]
+main = sequence_ $ [q2, q4a, q4b]
 
