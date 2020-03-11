@@ -30,7 +30,7 @@ time :: [Float]
 time = iterate (+ dt) dt
 
 controlInput :: [Control]
-controlInput = map (\x -> V2 (2 * sin (x / 4)) (0.001)) time
+controlInput = map (\x -> V2 (1 + (sin x)) (sin x)) time
 
 initialState :: StatePose
 initialState = StatePose (V3 0 0 0) (identity !!* 0.01 :: Covariance)
