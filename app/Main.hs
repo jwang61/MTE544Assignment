@@ -6,10 +6,21 @@ import qualified Q3
 import qualified Q4a
 import qualified Q4b
 
-q2 :: IO Bool
-q2 = plot (PNG "image/q2.png") $ map (\(x, y) -> Data2D [Title ("R = " ++ show x), Color y, Style Lines] [] (map Q2.toStateX (states x))) [(0, Red), (0.001, Blue), (0.01, Green)]
+-- Problem 2 with Varying R
+q2r :: IO Bool
+q2r = plot (PNG "image/q2r.png") $ map (\(x, y) -> Data2D [Title ("R = " ++ show x), Color y, Style Lines] [] (map Q2.toStateX (states x 1.0))) [(0, Red), (0.001, Blue), (0.01, Green)]
   where states = Q2.repeatKFStep 100 Q2.initialState Q2.controlInput
 
+-- Problem 2 with Varying Q
+q2q :: IO Bool
+q2q = plot (PNG "image/q2q.png") $
+  map (\(x, y) -> Data2D [Title ("Q = " ++ show x ++ " * Qt"),
+                          Color y,
+                          Style Lines] [] (map Q2.toStateX (states 0 x)))
+      [(0.5, Red), (1, Blue), (2, Green)]
+  where states = Q2.repeatKFStep 100 Q2.initialState Q2.controlInput
+
+-- Problem 3 trajectory and rmse plots
 q3 :: IO Bool
 q3 = do
   _ <- plot (PNG "image/q3_traj.png")
@@ -27,14 +38,26 @@ q3 = do
         noisyState1 = Q3.repeatStep 100 Q3.initialState noisyControl1
         noisyState2 = Q3.repeatStep 100 Q3.initialState noisyControl2
 
-q4a :: IO Bool
-q4a = plot (PNG "image/q4a.png") $ map (\(x, y) -> Data2D [Title ("R = " ++ show x), Color y, Style Lines] [] (map Q4a.toStateX (states x))) [(0, Red), (0.001, Blue), (0.01, Green)]
+-- Problem 4 with measurement A varying R
+q4ar :: IO Bool
+q4ar = plot (PNG "image/q4ar.png") $ map (\(x, y) -> Data2D [Title ("R = " ++ show x), Color y, Style Lines] [] (map Q4a.toStateX (states x 1))) [(0, Red), (0.001, Blue), (0.01, Green)]
   where states = Q4a.repeatKFStep 200 Q4a.initialState Q4a.controlInput
 
-q4b :: IO Bool
-q4b = plot (PNG "image/q4b.png") $ map (\(x, y) -> Data2D [Title ("R = " ++ show x), Color y, Style Lines] [] (map Q4b.toStateX (states x))) [(0, Red), (0.001, Blue), (0.01, Green)]
+-- Problem 4 with measurement B varying R
+q4br :: IO Bool
+q4br = plot (PNG "image/q4br.png") $ map (\(x, y) -> Data2D [Title ("R = " ++ show x), Color y, Style Lines] [] (map Q4b.toStateX (states x 1))) [(0, Red), (0.001, Blue), (0.01, Green)]
+  where states = Q4b.repeatKFStep 200 Q4b.initialState Q4b.controlInput
+
+-- Problem 4 with measurement A varying Q
+q4aq :: IO Bool
+q4aq = plot (PNG "image/q4aq.png") $ map (\(x, y) -> Data2D [Title ("Q = " ++ show x ++ " * Qt"), Color y, Style Lines] [] (map Q4a.toStateX (states 0 x))) [(0.5, Red), (1, Blue), (2, Green)]
+  where states = Q4a.repeatKFStep 200 Q4a.initialState Q4a.controlInput
+
+-- Problem 4 with measurement B varying Q
+q4bq :: IO Bool
+q4bq = plot (PNG "image/q4bq.png") $ map (\(x, y) -> Data2D [Title ("Q = " ++ show x ++ " * Qt"), Color y, Style Lines] [] (map Q4b.toStateX (states 0 x))) [(0.5, Red), (1, Blue), (2, Green)]
   where states = Q4b.repeatKFStep 200 Q4b.initialState Q4b.controlInput
 
 main :: IO ()
-main = sequence_ $ [q2, q4a, q4b]
+main = sequence_ $ [q2r, q2q, q3, q4ar, q4br, q4aq, q4bq]
 

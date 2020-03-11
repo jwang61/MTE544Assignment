@@ -22,10 +22,10 @@ time :: [Float]
 time = iterate (+ dt) 0
 
 leftEncoder :: [Float]
-leftEncoder = map cos time
+leftEncoder = map (cos . (/2)) time
 
 rightEncoder :: [Float]
-rightEncoder = map sin time
+rightEncoder = map (sin . (/2)) time
 
 dCenter :: Float -> Float -> Float
 dCenter l r = (l + r) / 2

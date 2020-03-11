@@ -41,16 +41,16 @@ qmat :: M22 Float
 qmat = V2 (V2 0.1 0)
           (V2 0 0.3)
 
-createMeasNoise :: Int -> Measurement
-createMeasNoise i = (sqrt <$> qmat) !* randVec
+createMeasNoise :: Int -> Float -> Measurement
+createMeasNoise i q = (sqrt <$> qt) !* randVec
   where randVec = V2 (randMeasure !! (i * 2)) (randMeasure !! (i * 2 + 1))
+        qt = qmat !!* q
 
 updateStateX :: Control -> State -> State
 updateStateX u x = x + V4 (dt * u ^._x * cos (x ^._w))
                           (dt * u ^._x * sin (x ^._w))
                           (dt * u ^._y)
                           (dt * u ^._x * tan (x ^._z + dt * u ^._y))
-
 
 getStateTransition ::  Control -> State -> Covariance
 getStateTransition u x = V4 (V4 1 0 0 (-dt * u ^._x * sin (x ^._w)))
@@ -76,20 +76,20 @@ predict u sp r = StatePose (updateStateX u (stateX sp)) ((f !*! p !*! (transpose
         rt = rmat !!* r
         f = getStateTransition u (stateX sp)
 
-update :: Measurement -> StatePose -> StatePose
-update z sp = StatePose (x + k !* y) (((identity :: M44 Float) !-! (k !*! h)) !*! p)
+update :: Measurement -> StatePose -> Float -> StatePose
+update z sp q = StatePose (x + k !* y) (((identity :: M44 Float) !-! (k !*! h)) !*! p)
   where x = stateX sp           :: State
         p = stateP sp           :: Covariance
         y = z - (hFunc x)       :: Measurement
         h = hJacobian x         :: M24 Float
-        b = (h !*! p !*! (transpose h)) !+! qmat :: M22 Float
+        b = (h !*! p !*! (transpose h)) !+! (qmat !!* q) :: M22 Float
         k = p !*! (transpose h) !*! (inv22 b) :: M42 Float
 
 fakeMeasurements :: State -> Measurement -> Measurement
 fakeMeasurements x noise = hFunc x + noise
 
-kfStep :: Control -> Measurement -> StatePose -> Float -> StatePose
-kfStep u mNoise sp r = update z sp'
+kfStep :: Control -> Measurement -> StatePose -> Float -> Float -> StatePose
+kfStep u mNoise sp r q = update z sp' q
   where sp' = predict u sp r
         z = fakeMeasurements (stateX sp') mNoise
 
@@ -101,14 +101,13 @@ printState sp = putStrLn ("X: " ++ show x ++ " Y: " ++ show y)
   where x = (stateX sp) ^._x
         y = (stateX sp) ^._y
 
-repeatKFStep :: Int -> StatePose -> [Control] -> Float -> [StatePose]
-repeatKFStep n' sp' inp' r = repeatKFStep' n' sp' inp' r 0
+repeatKFStep :: Int -> StatePose -> [Control] -> Float -> Float -> [StatePose]
+repeatKFStep n' sp' inp' r q = repeatKFStep' n' sp' inp' r q 0
 
-repeatKFStep' :: Int -> StatePose -> [Control] -> Float -> Int -> [StatePose]
-repeatKFStep' n sp inp r i
+repeatKFStep' :: Int -> StatePose -> [Control] -> Float -> Float -> Int -> [StatePose]
+repeatKFStep' n sp inp r q i
   | i == n = []
-  | otherwise = sp' : repeatKFStep' n sp' fs r (i+1)
+  | otherwise = sp' : repeatKFStep' n sp' fs r q (i+1)
   where (f : fs) = inp
-        mNoise = createMeasNoise i
-        sp' = kfStep f mNoise sp r
-
+        mNoise = createMeasNoise i q
+        sp' = kfStep f mNoise sp r q
